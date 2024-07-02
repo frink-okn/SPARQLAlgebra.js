@@ -2,7 +2,7 @@ import * as A from './algebra';
 import * as RDF from '@rdfjs/types';
 import { DataFactory } from 'rdf-data-factory';
 import { stringToTerm } from "rdf-string";
-import { Wildcard } from 'sparqljs';
+import { Wildcard } from 'sparqljs-nrt';
 
 export default class Factory
 {
@@ -21,6 +21,17 @@ export default class Factory
         const result = <A.BoundAggregate>this.createAggregateExpression(aggregate, expression, distinct, separator);
         result.variable = variable;
         return result;
+    }
+    createPaths(shortest?: boolean, cyclic?: boolean, start?: RDF.Variable | RDF.NamedNode, via?: RDF.Variable | RDF.NamedNode, end?: RDF.Variable | RDF.NamedNode, maxlength?: number): A.Paths {
+        return { 
+            type: A.types.PATHS,
+            shortest,
+            cyclic,
+            start,
+            via,
+            end,
+            maxlength
+        };
     }
     createBgp (patterns: A.Pattern[]): A.Bgp { return { type: A.types.BGP, patterns }; }
     createConstruct (input: A.Operation, template: A.Pattern[]): A.Construct { return { type: A.types.CONSTRUCT, input, template }; }

@@ -1,5 +1,5 @@
 import * as rdfjs from '@rdfjs/types';
-import { Wildcard } from 'sparqljs';
+import { IriTerm, Wildcard } from 'sparqljs-nrt';
 import { Term } from '@rdfjs/types';
 
 export enum types {
@@ -35,7 +35,7 @@ export enum types {
     VALUES=             'values',
     ZERO_OR_MORE_PATH=  'ZeroOrMorePath',
     ZERO_OR_ONE_PATH=   'ZeroOrOnePath',
-
+    PATHS=              'paths',
     COMPOSITE_UPDATE=   'compositeupdate',
     DELETE_INSERT=      'deleteinsert',
     LOAD=               'load',
@@ -63,7 +63,7 @@ type valueOf<T> = T[keyof T];
 export type Operation =
   Ask | Expression | Bgp | Construct | Describe | Distinct | Extend | From | Filter | Graph | Group | Join | LeftJoin |
   Minus | Nop | OrderBy | Path | Pattern | Project | PropertyPathSymbol | Reduced | Service | Slice | Union | Values |
-  Update;
+  Update | Paths;
 
 export type Expression = AggregateExpression | GroupConcatExpression | ExistenceExpression | NamedExpression |
   OperatorExpression | TermExpression | WildcardExpression | BoundAggregate;
@@ -82,6 +82,17 @@ export interface BaseOperation
     [key:string]: any;
     metadata?: Record<string, unknown>;
     type: types;
+}
+// The interface for paths is added with types corresponding to the definitions in sparql-nrt
+export interface Paths extends BaseOperation
+{
+    type : types.PATHS;
+    shortest?: boolean;
+    cyclic?: boolean;
+    start?: rdfjs.Variable | IriTerm;
+    via?: rdfjs.Variable  | IriTerm;
+    end?: rdfjs.Variable  | IriTerm;
+    maxlength?: number
 }
 
 export interface Single extends BaseOperation
