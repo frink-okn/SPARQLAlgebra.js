@@ -14,12 +14,15 @@ import {
     GroupPattern,
     InsertDeleteOperation,
     IriTerm,
+    // VarorIriOrListOfIris,
+    // ListOfIris,
     LoadOperation,
     Ordering,
     Pattern,
     PropertyPath,
     Query,
     SelectQuery,
+    PathsQuery,
     SparqlQuery,
     Triple,
     Update,
@@ -27,12 +30,12 @@ import {
     Variable,
     VariableExpression,
     Wildcard
-} from 'sparqljs';
+} from 'sparqljs-nrt';
 import * as Algebra from './algebra';
 import Factory from './factory';
 import Util from './util';
 
-const Parser = require('sparqljs').Parser;
+const Parser = require('sparqljs-nrt').Parser;
 const types = Algebra.types;
 
 let variables = new Set<string>();
@@ -98,10 +101,15 @@ function translateQuery(sparql: SparqlQuery, quads?: boolean, blankToVariable?: 
     findAllVariables(sparql);
 
     if (sparql.type === 'query') {
+        if (sparql.queryType == 'PATHS'){
+            res = translatePathsQuery(sparql as PathsQuery);
+        }
+        else{
         // group and where are identical, having only 1 makes parsing easier, can be undefined in DESCRIBE
         const group: GroupPattern = { type: 'group', patterns: sparql.where || [] };
         res = translateGraphPattern(group);
         res = translateAggregates(sparql, res);
+        }
     }
     else if(sparql.type === 'update') {
         res = translateUpdate(sparql);
@@ -249,6 +257,17 @@ function inScopeVariables(thingy: SparqlQuery | Pattern | PropertyPath | RDF.Ter
 
     return inScope;
 }
+function translatePathsQuery(sparql: PathsQuery): Algebra.Operation {
+    return factory.createPaths(
+        sparql.shortest,
+        sparql.cyclic,
+        sparql.start ? sparql.start as RDF.Variable | RDF.NamedNode : undefined,
+        sparql.via ? sparql.via as RDF.Variable | RDF.NamedNode : undefined,
+        sparql.end ? sparql.end as RDF.Variable | RDF.NamedNode : undefined,
+        sparql.maxlength
+    );
+}
+
 
 function translateGraphPattern(thingy: Pattern) : Algebra.Operation
 {

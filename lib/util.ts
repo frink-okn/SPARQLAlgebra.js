@@ -1,4 +1,4 @@
-import { Wildcard } from 'sparqljs';
+import { Wildcard } from 'sparqljs-nrt';
 import * as A from "./algebra";
 import { Expression, Operation, expressionTypes, types, TypedOperation, TypedExpression } from './algebra';
 import Factory from "./factory";
@@ -180,7 +180,7 @@ export default class Util
             return;
 
         let recurseOp = (op: A.Operation) => Util.recurseOperation(op, callbacks);
-
+        
         switch (result.type)
         {
             case types.ALT:
@@ -351,6 +351,17 @@ export default class Util
 
             return result;
         }
+        if (result.type === types.PATHS) {
+            result = factory.createPaths(
+                result.shortest,
+                result.cyclic,
+                result.start ? result.start as RDF.Variable | RDF.NamedNode : undefined,
+                result.via ? result.via as RDF.Variable | RDF.NamedNode : undefined,
+                result.end ? result.end as RDF.Variable | RDF.NamedNode : undefined,
+                result.maxlength
+            );
+        }
+        else{
 
         let mapOp = (op: A.Operation) => Util.mapOperation(op, callbacks, factory);
 
@@ -493,6 +504,7 @@ export default class Util
                 break;
             default: throw new Error(`Unknown Operation type ${(result as any).type}`);
         }
+    }
 
         // Inherit metadata
         if (toCopyMetadata) {

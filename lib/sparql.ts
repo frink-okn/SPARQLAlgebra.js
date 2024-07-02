@@ -23,6 +23,7 @@ import {
     PropertyPath,
     Query,
     SelectQuery,
+    PathsQuery,
     ServicePattern,
     Triple,
     UnionPattern,
@@ -31,7 +32,7 @@ import {
     ValuesPattern,
     Variable,
     Wildcard
-} from 'sparqljs';
+} from 'sparqljs-nrt';
 import * as Algebra from './algebra';
 import Factory from './factory';
 import Util from './util';
@@ -108,10 +109,26 @@ function translateOperation(op: Algebra.Operation): any
         case types.ADD:              return translateAdd(op);
         case types.MOVE:             return translateMove(op);
         case types.COPY:             return translateCopy(op);
+        case types.PATHS:            return translatePaths(op);
     }
 
     throw new Error(`Unknown Operation type ${op.type}`);
 }
+
+function translatePaths(op: Algebra.Paths): PathsQuery {
+    return {
+        type: 'query',
+        queryType: 'PATHS',
+        prefixes: {},
+        shortest: op.shortest || false,
+        cyclic: op.cyclic || false,
+        start: op.start ? op.start as Variable : undefined,
+        via: op.via ? op.via as Variable : undefined,
+        end: op.end ? op.end as Variable : undefined,
+        maxlength: op.maxlength || undefined,
+    };
+}
+
 
 function translateExpression(expr: Algebra.Expression): any
 {
@@ -206,6 +223,7 @@ function translateOperatorExpression(expr: Algebra.OperatorExpression): Ordering
 
     if (result.operator === 'in' || result.operator === 'notin')
         result.args = [result.args[0]].concat([result.args.slice(1)]);
+        //result.args = [result.args[0], result.args.slice(1) as any];
 
     return result;
 }
