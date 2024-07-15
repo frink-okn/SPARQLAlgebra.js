@@ -119,12 +119,12 @@ function translatePaths(op: Algebra.Paths): PathsQuery {
     return {
         type: 'query',
         queryType: 'PATHS',
+        start: op.start ,
+        via: op.via ,
+        end: op.end ,
         prefixes: {},
         shortest: op.shortest || false,
         cyclic: op.cyclic || false,
-        start: op.start ? op.start as Variable : undefined,
-        via: op.via ? op.via as Variable : undefined,
-        end: op.end ? op.end as Variable : undefined,
         maxlength: op.maxlength || undefined,
     };
 }

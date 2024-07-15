@@ -2,7 +2,7 @@ import * as A from './algebra';
 import * as RDF from '@rdfjs/types';
 import { DataFactory } from 'rdf-data-factory';
 import { stringToTerm } from "rdf-string";
-import { Wildcard } from 'sparqljs-nrt';
+import { IriTerm, Wildcard } from 'sparqljs-nrt';
 
 export default class Factory
 {
@@ -22,15 +22,15 @@ export default class Factory
         result.variable = variable;
         return result;
     }
-    createPaths(shortest?: boolean, cyclic?: boolean, start?: RDF.Variable | RDF.NamedNode, via?: RDF.Variable | RDF.NamedNode, end?: RDF.Variable | RDF.NamedNode, maxlength?: number): A.Paths {
+    createPaths(start: IriTerm , via: IriTerm, end: IriTerm , shortest?: boolean, cyclic?: boolean, maxlength?: number): A.Paths {
         return { 
             type: A.types.PATHS,
-            shortest,
-            cyclic,
             start,
             via,
             end,
-            maxlength
+            maxlength,
+            shortest,
+            cyclic,
         };
     }
     createBgp (patterns: A.Pattern[]): A.Bgp { return { type: A.types.BGP, patterns }; }

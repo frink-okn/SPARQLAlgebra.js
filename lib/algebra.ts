@@ -87,11 +87,11 @@ export interface BaseOperation
 export interface Paths extends BaseOperation
 {
     type : types.PATHS;
+    start:  IriTerm ;
+    via: IriTerm;
+    end: IriTerm ;
     shortest?: boolean;
     cyclic?: boolean;
-    start?: rdfjs.Variable | IriTerm;
-    via?: rdfjs.Variable  | IriTerm;
-    end?: rdfjs.Variable  | IriTerm;
     maxlength?: number
 }
 

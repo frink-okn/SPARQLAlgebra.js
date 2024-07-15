@@ -259,11 +259,11 @@ function inScopeVariables(thingy: SparqlQuery | Pattern | PropertyPath | RDF.Ter
 }
 function translatePathsQuery(sparql: PathsQuery): Algebra.Operation {
     return factory.createPaths(
+        sparql.start,
+        sparql.via,
+        sparql.end,
         sparql.shortest,
         sparql.cyclic,
-        sparql.start ? sparql.start as RDF.Variable | RDF.NamedNode : undefined,
-        sparql.via ? sparql.via as RDF.Variable | RDF.NamedNode : undefined,
-        sparql.end ? sparql.end as RDF.Variable | RDF.NamedNode : undefined,
         sparql.maxlength
     );
 }

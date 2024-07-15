@@ -183,6 +183,8 @@ export default class Util
         
         switch (result.type)
         {
+            case types.PATHS:
+            break
             case types.ALT:
                 result.input.map(recurseOp);
                 break;
@@ -353,11 +355,11 @@ export default class Util
         }
         if (result.type === types.PATHS) {
             result = factory.createPaths(
+                result.start,
+                result.via ,
+                result.end,
                 result.shortest,
                 result.cyclic,
-                result.start ? result.start as RDF.Variable | RDF.NamedNode : undefined,
-                result.via ? result.via as RDF.Variable | RDF.NamedNode : undefined,
-                result.end ? result.end as RDF.Variable | RDF.NamedNode : undefined,
                 result.maxlength
             );
         }
