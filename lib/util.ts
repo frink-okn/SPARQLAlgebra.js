@@ -1,4 +1,4 @@
-import { Wildcard } from 'sparqljs-nrt';
+import { Wildcard } from 'sparqljs';
 import * as A from "./algebra";
 import { Expression, Operation, expressionTypes, types, TypedOperation, TypedExpression } from './algebra';
 import Factory from "./factory";
@@ -355,12 +355,15 @@ export default class Util
         }
         if (result.type === types.PATHS) {
             result = factory.createPaths(
-                result.start,
-                result.via ,
-                result.end,
-                result.shortest,
-                result.cyclic,
-                result.maxlength
+            result.start.var,
+            result.start.value,
+            result.via.var,
+            result.via.value,
+            result.end.var,
+            result.end.value,
+            result.shortest,
+            result.cyclic,
+            result.maxlength
             );
         }
         else{

@@ -1,6 +1,7 @@
 import * as rdfjs from '@rdfjs/types';
-import { IriTerm, Wildcard } from 'sparqljs-nrt';
+import { IriTerm, Wildcard } from 'sparqljs';
 import { Term } from '@rdfjs/types';
+import { Variable, Pattern as P } from 'sparqljs';
 
 export enum types {
     ALT=                'alt',
@@ -84,15 +85,29 @@ export interface BaseOperation
     type: types;
 }
 // The interface for paths is added with types corresponding to the definitions in sparql-nrt
-export interface Paths extends BaseOperation
-{
-    type : types.PATHS;
-    start:  IriTerm ;
-    via: IriTerm;
-    end: IriTerm ;
+export interface Paths extends BaseOperation {
+    type: types.PATHS;
+    start: PathValue; // Use the PathValue interface directly
+    via: PathViaValue; // Assuming PathViaValue is correctly defined elsewhere
+    end: PathValue; // Use the PathValue interface direct
     shortest?: boolean;
     cyclic?: boolean;
-    maxlength?: number
+    maxlength?: number;
+}
+export interface PathViaValue {
+    var: {
+        type: Variable,
+        value : string
+    },
+    value?: IriTerm | P[] | null;
+}
+
+export interface PathValue {
+    var:{
+        type: Variable,
+        value : string
+    },
+    value: IriTerm | P[];
 }
 
 export interface Single extends BaseOperation

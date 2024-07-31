@@ -1,8 +1,8 @@
 import * as A from './algebra';
 import * as RDF from '@rdfjs/types';
-import { DataFactory } from 'rdf-data-factory';
+import { DataFactory, Variable } from 'rdf-data-factory';
 import { stringToTerm } from "rdf-string";
-import { IriTerm, Wildcard } from 'sparqljs-nrt';
+import { IriTerm, Wildcard, Variable as variable , Pattern} from 'sparqljs';
 
 export default class Factory
 {
@@ -22,17 +22,38 @@ export default class Factory
         result.variable = variable;
         return result;
     }
-    createPaths(start: IriTerm , via: IriTerm, end: IriTerm , shortest?: boolean, cyclic?: boolean, maxlength?: number): A.Paths {
-        return { 
+    // createPaths(start: IriTerm , via: IriTerm, end: IriTerm , shortest?: boolean, cyclic?: boolean, maxlength?: number): A.Paths {
+    //     return { 
+    //         type: A.types.PATHS,
+    //         start,
+    //         via,
+    //         end,
+    //         maxlength,
+    //         shortest,
+    //         cyclic,
+    //     };
+    // }
+    createPaths(startVar: {type: variable, value: string}, startValue: IriTerm | Pattern[], viaVar: {type: variable, value: string}, viaValue: IriTerm | Pattern[] | null | undefined, endVar: {type: variable, value: string}, endValue: IriTerm | Pattern[], shortest?: boolean , cyclic?: boolean , maxlength?: number): A.Paths {
+        return {
             type: A.types.PATHS,
-            start,
-            via,
-            end,
+            start: {
+                var: startVar,
+                value: startValue
+            },
+            via:  {
+                var:viaVar,
+                value: viaValue 
+            },
+            end: {
+                var: endVar,
+                value: endValue
+            },
             maxlength,
             shortest,
-            cyclic,
+            cyclic
         };
     }
+    
     createBgp (patterns: A.Pattern[]): A.Bgp { return { type: A.types.BGP, patterns }; }
     createConstruct (input: A.Operation, template: A.Pattern[]): A.Construct { return { type: A.types.CONSTRUCT, input, template }; }
     createDescribe (input: A.Operation, terms: (RDF.Variable | RDF.NamedNode)[]): A.Describe { return { type: A.types.DESCRIBE, input, terms }; }

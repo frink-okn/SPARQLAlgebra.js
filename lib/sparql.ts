@@ -32,7 +32,7 @@ import {
     ValuesPattern,
     Variable,
     Wildcard
-} from 'sparqljs-nrt';
+} from 'sparqljs';
 import * as Algebra from './algebra';
 import Factory from './factory';
 import Util from './util';
@@ -119,7 +119,7 @@ function translatePaths(op: Algebra.Paths): PathsQuery {
     return {
         type: 'query',
         queryType: 'PATHS',
-        start: op.start ,
+        start: op.start,
         via: op.via ,
         end: op.end ,
         prefixes: {},

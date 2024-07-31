@@ -30,12 +30,12 @@ import {
     Variable,
     VariableExpression,
     Wildcard
-} from 'sparqljs-nrt';
+} from 'sparqljs';
 import * as Algebra from './algebra';
 import Factory from './factory';
 import Util from './util';
 
-const Parser = require('sparqljs-nrt').Parser;
+const Parser = require('sparqljs').Parser;
 const types = Algebra.types;
 
 let variables = new Set<string>();
@@ -259,9 +259,12 @@ function inScopeVariables(thingy: SparqlQuery | Pattern | PropertyPath | RDF.Ter
 }
 function translatePathsQuery(sparql: PathsQuery): Algebra.Operation {
     return factory.createPaths(
-        sparql.start,
-        sparql.via,
-        sparql.end,
+        sparql.start.var,
+        sparql.start.value,
+        sparql.via.var,
+        sparql.via.value,
+        sparql.end.var,
+        sparql.end.value,
         sparql.shortest,
         sparql.cyclic,
         sparql.maxlength
