@@ -180,9 +180,11 @@ export default class Util
             return;
 
         let recurseOp = (op: A.Operation) => Util.recurseOperation(op, callbacks);
-
+        
         switch (result.type)
         {
+            case types.PATHS:
+            break
             case types.ALT:
                 result.input.map(recurseOp);
                 break;
@@ -351,6 +353,20 @@ export default class Util
 
             return result;
         }
+        if (result.type === types.PATHS) {
+            result = factory.createPaths(
+            result.start.var,
+            result.start.value,
+            result.via.var,
+            result.via.value,
+            result.end.var,
+            result.end.value,
+            result.shortest,
+            result.cyclic,
+            result.maxlength
+            );
+        }
+        else{
 
         let mapOp = (op: A.Operation) => Util.mapOperation(op, callbacks, factory);
 
@@ -493,6 +509,7 @@ export default class Util
                 break;
             default: throw new Error(`Unknown Operation type ${(result as any).type}`);
         }
+    }
 
         // Inherit metadata
         if (toCopyMetadata) {

@@ -14,12 +14,15 @@ import {
     GroupPattern,
     InsertDeleteOperation,
     IriTerm,
+    // VarorIriOrListOfIris,
+    // ListOfIris,
     LoadOperation,
     Ordering,
     Pattern,
     PropertyPath,
     Query,
     SelectQuery,
+    PathsQuery,
     SparqlQuery,
     Triple,
     Update,
@@ -98,10 +101,15 @@ function translateQuery(sparql: SparqlQuery, quads?: boolean, blankToVariable?: 
     findAllVariables(sparql);
 
     if (sparql.type === 'query') {
+        if (sparql.queryType == 'PATHS'){
+            res = translatePathsQuery(sparql as PathsQuery);
+        }
+        else{
         // group and where are identical, having only 1 makes parsing easier, can be undefined in DESCRIBE
         const group: GroupPattern = { type: 'group', patterns: sparql.where || [] };
         res = translateGraphPattern(group);
         res = translateAggregates(sparql, res);
+        }
     }
     else if(sparql.type === 'update') {
         res = translateUpdate(sparql);
@@ -249,6 +257,20 @@ function inScopeVariables(thingy: SparqlQuery | Pattern | PropertyPath | RDF.Ter
 
     return inScope;
 }
+function translatePathsQuery(sparql: PathsQuery): Algebra.Operation {
+    return factory.createPaths(
+        sparql.start.var,
+        sparql.start.value,
+        sparql.via.var,
+        sparql.via.value,
+        sparql.end.var,
+        sparql.end.value,
+        sparql.shortest,
+        sparql.cyclic,
+        sparql.maxlength
+    );
+}
+
 
 function translateGraphPattern(thingy: Pattern) : Algebra.Operation
 {
