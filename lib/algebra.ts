@@ -107,7 +107,7 @@ export interface PathValue {
         type: Variable,
         value : string
     },
-    value: IriTerm | P[];
+    value?: IriTerm | P[];
 }
 
 export interface Single extends BaseOperation
