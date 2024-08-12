@@ -88,7 +88,7 @@ export interface BaseOperation
 export interface Paths extends BaseOperation {
     type: types.PATHS;
     start: PathValue; // Use the PathValue interface directly
-    via: PathViaValue; // Assuming PathViaValue is correctly defined elsewhere
+    via: PathVia; // Assuming PathViaValue is correctly defined elsewhere
     end: PathValue; // Use the PathValue interface direct
     shortest?: boolean;
     cyclic?: boolean;
@@ -102,12 +102,17 @@ export interface PathViaValue {
     value?: IriTerm | P[] | null;
 }
 
+export type PathVia =  | { var: { type: Variable, value: string } } 
+| { value: IriTerm | P[] }; 
+
+
+
 export interface PathValue {
     var:{
         type: Variable,
         value : string
     },
-    value?: IriTerm | P[];
+    value: IriTerm | P[];
 }
 
 export interface Single extends BaseOperation

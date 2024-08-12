@@ -33,17 +33,14 @@ export default class Factory
     //         cyclic,
     //     };
     // }
-    createPaths(startVar: {type: variable, value: string}, startValue: IriTerm | Pattern[]| undefined, viaVar: {type: variable, value: string}, viaValue: IriTerm | Pattern[] | null | undefined, endVar: {type: variable, value: string}, endValue: IriTerm | Pattern[]| undefined, shortest?: boolean , cyclic?: boolean , maxlength?: number): A.Paths {
+    createPaths(startVar: {type: variable, value: string}, startValue: IriTerm | Pattern[], viaVar: {type: variable, value: string} |undefined , viaValue: IriTerm | Pattern[] | undefined, endVar: {type: variable, value: string}, endValue: IriTerm | Pattern[], shortest?: boolean , cyclic?: boolean , maxlength?: number): A.Paths {
         return {
             type: A.types.PATHS,
             start: {
                 var: startVar,
                 value: startValue
             },
-            via:  {
-                var:viaVar,
-                value: viaValue 
-            },
+            via:  viaVar?{ var: viaVar} : viaValue?{value: viaValue } : undefined as any,
             end: {
                 var: endVar,
                 value: endValue

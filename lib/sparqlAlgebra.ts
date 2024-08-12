@@ -258,11 +258,23 @@ function inScopeVariables(thingy: SparqlQuery | Pattern | PropertyPath | RDF.Ter
     return inScope;
 }
 function translatePathsQuery(sparql: PathsQuery): Algebra.Operation {
+    let viaVar : {type: Variable, value: string} |undefined ;
+    let viaValue: IriTerm | Pattern[] | undefined;
+
+    if ("var" in sparql.via){
+        viaVar = sparql.via.var;
+        viaValue = undefined;
+    }
+    else {
+        viaValue = sparql.via.value;
+        viaVar = undefined;
+
+    }
     return factory.createPaths(
         sparql.start.var,
         sparql.start.value,
-        sparql.via.var,
-        sparql.via.value,
+        viaVar,
+        viaValue,
         sparql.end.var,
         sparql.end.value,
         sparql.shortest,

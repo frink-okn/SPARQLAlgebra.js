@@ -354,11 +354,21 @@ export default class Util
             return result;
         }
         if (result.type === types.PATHS) {
+            let viaVar = undefined ;
+            let viaValue = undefined;
+
+            if ("var" in result.via){
+                viaVar = result.via.var;
+            }
+            else {
+                viaValue = result.via.value;
+
+            }
             result = factory.createPaths(
             result.start.var,
             result.start.value,
-            result.via.var,
-            result.via.value,
+            viaVar,
+            viaValue,
             result.end.var,
             result.end.value,
             result.shortest,
