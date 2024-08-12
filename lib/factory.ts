@@ -33,23 +33,41 @@ export default class Factory
     //         cyclic,
     //     };
     // }
-    createPaths(startVar: {type: variable, value: string}, startValue: IriTerm | Pattern[], viaVar: {type: variable, value: string} |undefined , viaValue: IriTerm | Pattern[] | undefined, endVar: {type: variable, value: string}, endValue: IriTerm | Pattern[], shortest?: boolean , cyclic?: boolean , maxlength?: number): A.Paths {
+    createPaths(
+        startVar: { type: variable, value: string }, 
+        startValue: IriTerm | Pattern[] | undefined, 
+        viaVar: { type: variable, value: string } | undefined, 
+        viaValue: IriTerm | Pattern[] | undefined, 
+        endVar: { type: variable, value: string }, 
+        endValue: IriTerm | Pattern[] | undefined, 
+        shortest: boolean, 
+        all: boolean,
+        cyclic: boolean, 
+        maxlength: number | undefined,
+        limit: number | undefined,
+        offset: number | undefined
+        
+    ): A.Paths {
         return {
             type: A.types.PATHS,
             start: {
                 var: startVar,
                 value: startValue
             },
-            via:  viaVar?{ var: viaVar} : viaValue?{value: viaValue } : undefined as any,
+            via: viaVar ? { var: viaVar } : viaValue ? { value: viaValue } : undefined as any,
             end: {
                 var: endVar,
                 value: endValue
             },
-            maxlength,
             shortest,
-            cyclic
+            all,
+            cyclic,
+            maxlength,
+            limit,
+            offset
         };
     }
+    
     
     createBgp (patterns: A.Pattern[]): A.Bgp { return { type: A.types.BGP, patterns }; }
     createConstruct (input: A.Operation, template: A.Pattern[]): A.Construct { return { type: A.types.CONSTRUCT, input, template }; }

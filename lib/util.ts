@@ -372,8 +372,11 @@ export default class Util
             result.end.var,
             result.end.value,
             result.shortest,
+            result.all,
             result.cyclic,
-            result.maxlength
+            result.maxlength,
+            result.limit,
+            result.offset
             );
         }
         else{

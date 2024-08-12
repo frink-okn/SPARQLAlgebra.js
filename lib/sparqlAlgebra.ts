@@ -257,7 +257,7 @@ function inScopeVariables(thingy: SparqlQuery | Pattern | PropertyPath | RDF.Ter
 
     return inScope;
 }
-function translatePathsQuery(sparql: PathsQuery): Algebra.Operation {
+function translatePathsQuery(sparql: PathsQuery): Algebra.Paths {
     let viaVar : {type: Variable, value: string} |undefined ;
     let viaValue: IriTerm | Pattern[] | undefined;
 
@@ -278,8 +278,11 @@ function translatePathsQuery(sparql: PathsQuery): Algebra.Operation {
         sparql.end.var,
         sparql.end.value,
         sparql.shortest,
+        sparql.all,
         sparql.cyclic,
-        sparql.maxlength
+        sparql.maxlength,
+        sparql.limit,
+        sparql.offset
     );
 }
 

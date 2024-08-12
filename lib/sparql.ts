@@ -122,10 +122,13 @@ function translatePaths(op: Algebra.Paths): PathsQuery {
         start: op.start,
         via: op.via ,
         end: op.end ,
-        prefixes: {},
-        shortest: op.shortest || false,
-        cyclic: op.cyclic || false,
+        prefixes : op.prefixes,
+        shortest: op.shortest,
+        all: op.all,
+        cyclic: op.cyclic,
         maxlength: op.maxlength || undefined,
+        limit: op.limit || undefined,
+        offset: op.offset || undefined
     };
 }
 
