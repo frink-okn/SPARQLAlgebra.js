@@ -122,7 +122,6 @@ function translatePaths(op: Algebra.Paths): PathsQuery {
         start: op.start,
         via: op.via ,
         end: op.end ,
-        prefixes : op.prefixes,
         shortest: op.shortest,
         all: op.all,
         cyclic: op.cyclic,
