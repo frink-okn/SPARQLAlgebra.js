@@ -257,35 +257,28 @@ function inScopeVariables(thingy: SparqlQuery | Pattern | PropertyPath | RDF.Ter
 
     return inScope;
 }
-function translatePathsQuery(sparql: PathsQuery): Algebra.Paths {
-    let viaVar : {type: Variable, value: string} |undefined ;
-    let viaValue: IriTerm | Pattern[] | undefined;
 
-    if ("var" in sparql.via){
-        viaVar = sparql.via.var;
-        viaValue = undefined;
-    }
-    else {
-        viaValue = sparql.via.value;
-        viaVar = undefined;
-
+function translatePathsQuery(sparql: PathsQuery): Algebra.Paths
+{
+    let via: Algebra.PathVia;
+    if (sparql.via.type === 'Path') {
+        via = { type: 'Path', value: translatePathPredicate(sparql.via.value) };
+    } else {
+        via = sparql.via;
     }
     return factory.createPaths(
-        sparql.start.var,
-        sparql.start.value,
-        viaVar,
-        viaValue,
-        sparql.end.var,
-        sparql.end.value,
+        sparql.start.variable,
+        sparql.start.input,
+        sparql.end.variable,
+        sparql.end.input,
+        via,
         sparql.shortest,
-        sparql.all,
         sparql.cyclic,
         sparql.maxlength,
         sparql.limit,
         sparql.offset
     );
 }
-
 
 function translateGraphPattern(thingy: Pattern) : Algebra.Operation
 {

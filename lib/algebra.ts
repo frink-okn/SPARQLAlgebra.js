@@ -1,5 +1,5 @@
 import * as rdfjs from '@rdfjs/types';
-import { IriTerm, Wildcard } from 'sparqljs';
+import { IriTerm, VariableTerm, Wildcard } from 'sparqljs';
 import { Term } from '@rdfjs/types';
 import { Variable, Pattern as P } from 'sparqljs';
 
@@ -84,40 +84,28 @@ export interface BaseOperation
     metadata?: Record<string, unknown>;
     type: types;
 }
-// The interface for paths is added with types corresponding to the definitions in sparql-nrt
+
 export interface Paths extends BaseOperation {
     type: types.PATHS;
-    start: PathValue; // Use the PathValue interface directly
-    via: PathVia; // Assuming PathViaValue is correctly defined elsewhere
-    end: PathValue; // Use the PathValue interface direct
+    start: PathEndpoint;
+    end: PathEndpoint;
+    via: PathVia;
     shortest: boolean;
-    all: boolean;
     cyclic: boolean;
     maxlength?: number;   
     limit?: number;
     offset?: number;
-    
-}
-export interface PathViaValue {
-    var: {
-        type: Variable,
-        value : string
-    },
-    value?: IriTerm | P[] | null;
 }
 
-export type PathVia =  | { var: { type: Variable, value: string } } 
-| { value: IriTerm | P[] }; 
-
-
-
-export interface PathValue {
-    var:{
-        type: Variable,
-        value : string
-    },
-    value?: IriTerm | P[];
+export interface PathEndpoint {
+    variable: VariableTerm;
+    input?: IriTerm | P[];
 }
+
+export type PathVia = 
+    { type: 'Variable', value: VariableTerm } |
+    { type: 'Path', value: PropertyPathSymbol } |
+    { type: 'Pattern', value: P[] };
 
 export interface Single extends BaseOperation
 {

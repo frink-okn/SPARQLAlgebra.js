@@ -31,7 +31,10 @@ import {
     ValuePatternRow,
     ValuesPattern,
     Variable,
-    Wildcard
+    Wildcard,
+    AskQuery,
+    DescribeQuery,
+    PathVia
 } from 'sparqljs';
 import * as Algebra from './algebra';
 import Factory from './factory';
@@ -116,21 +119,26 @@ function translateOperation(op: Algebra.Operation): any
 }
 
 function translatePaths(op: Algebra.Paths): PathsQuery {
+    let via: PathVia;
+    if (op.via.type === 'Path') {
+        via = { type: 'Path', value: translatePathComponent(op.via.value) };
+    } else {
+        via = op.via;
+    }
     return {
         type: 'query',
         queryType: 'PATHS',
+        prefixes: {},
         start: op.start,
-        via: op.via ,
-        end: op.end ,
+        end: op.end,
+        via: via,
         shortest: op.shortest,
-        all: op.all,
         cyclic: op.cyclic,
-        maxlength: op.maxlength || undefined,
-        limit: op.limit || undefined,
-        offset: op.offset || undefined
+        maxlength: op.maxlength,
+        limit: op.limit,
+        offset: op.offset
     };
 }
-
 
 function translateExpression(expr: Algebra.Expression): any
 {

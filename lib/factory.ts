@@ -2,7 +2,7 @@ import * as A from './algebra';
 import * as RDF from '@rdfjs/types';
 import { DataFactory, Variable } from 'rdf-data-factory';
 import { stringToTerm } from "rdf-string";
-import { IriTerm, Wildcard, Variable as variable , Pattern} from 'sparqljs';
+import { IriTerm, Wildcard, Variable as variable , Pattern, VariableTerm} from 'sparqljs';
 
 export default class Factory
 {
@@ -22,27 +22,14 @@ export default class Factory
         result.variable = variable;
         return result;
     }
-    // createPaths(start: IriTerm , via: IriTerm, end: IriTerm , shortest?: boolean, cyclic?: boolean, maxlength?: number): A.Paths {
-    //     return { 
-    //         type: A.types.PATHS,
-    //         start,
-    //         via,
-    //         end,
-    //         maxlength,
-    //         shortest,
-    //         cyclic,
-    //     };
-    // }
     createPaths(
-        startVar: { type: variable, value: string }, 
-        startValue: IriTerm | Pattern[] | undefined, 
-        viaVar: { type: variable, value: string } | undefined, 
-        viaValue: IriTerm | Pattern[] | undefined, 
-        endVar: { type: variable, value: string }, 
-        endValue: IriTerm | Pattern[] | undefined, 
-        shortest: boolean, 
-        all: boolean,
-        cyclic: boolean, 
+        startVar: VariableTerm, 
+        startValue: IriTerm | Pattern[] | undefined,
+        endVar: VariableTerm,
+        endValue: IriTerm | Pattern[] | undefined,
+        via: A.PathVia,
+        shortest: boolean,
+        cyclic: boolean,
         maxlength: number | undefined,
         limit: number | undefined,
         offset: number | undefined
@@ -51,24 +38,21 @@ export default class Factory
         return {
             type: A.types.PATHS,
             start: {
-                var: startVar,
-                value: startValue
+                variable: startVar,
+                input: startValue
             },
-            via: viaVar ? { var: viaVar } : viaValue ? { value: viaValue } : undefined as any,
             end: {
-                var: endVar,
-                value: endValue
+                variable: endVar,
+                input: endValue
             },
+            via,
             shortest,
-            all,
             cyclic,
             maxlength,
             limit,
             offset
         };
     }
-    
-    
     createBgp (patterns: A.Pattern[]): A.Bgp { return { type: A.types.BGP, patterns }; }
     createConstruct (input: A.Operation, template: A.Pattern[]): A.Construct { return { type: A.types.CONSTRUCT, input, template }; }
     createDescribe (input: A.Operation, terms: (RDF.Variable | RDF.NamedNode)[]): A.Describe { return { type: A.types.DESCRIBE, input, terms }; }
