@@ -263,8 +263,10 @@ function translatePathsQuery(sparql: PathsQuery): Algebra.Paths
     let via: Algebra.PathVia;
     if (sparql.via.type === 'Path') {
         via = { type: 'Path', value: translatePathPredicate(sparql.via.value) };
-    } else {
+    } else if (sparql.via.type === 'Variable') {
         via = sparql.via;
+    } else {        
+        via = { type: 'Pattern', value: translateGraphPattern(sparql.via.value) };
     }
     return factory.createPaths(
         sparql.start.variable,
@@ -274,7 +276,7 @@ function translatePathsQuery(sparql: PathsQuery): Algebra.Paths
         via,
         sparql.shortest,
         sparql.cyclic,
-        sparql.maxlength,
+        sparql.maxLength,
         sparql.limit,
         sparql.offset
     );
@@ -452,7 +454,7 @@ function translatePathPredicate(predicate: IriTerm | PropertyPath) : Algebra.Pro
         for (let item of items)
         {
             if (Util.isSimpleTerm(item))
-                normals.push(item);
+                normals.push(item as RDF.NamedNode);
             else if (item.pathType === '^')
                 inverted.push(item.items[0] as RDF.NamedNode);
             else
@@ -820,7 +822,7 @@ function mapAggregate (thingy: mapAggregateType, aggregates: NodeJS.Dict<Aggrega
     if ('expression' in thingy && thingy.expression)
         return { ...thingy, expression: mapAggregate(thingy.expression, aggregates) };
     if ('args' in thingy && thingy.args)
-        return { ...thingy, args: thingy.args.map(subthingy => mapAggregate(subthingy, aggregates)) };
+        return { ...thingy, args: thingy.args.map((subthingy: any) => mapAggregate(subthingy, aggregates)) };
 
     // Normal variable/wildcard
     return thingy;
@@ -905,7 +907,7 @@ function translateUpdateGraph (thingy: CreateOperation | ClearDropOperation): Al
 {
     let source: 'DEFAULT' | 'NAMED' | 'ALL' | RDF.NamedNode;
     if (Util.isSimpleTerm(thingy.graph))
-        source = thingy.graph;
+        source = thingy.graph as RDF.NamedNode;
     else if (thingy.graph.all)
         source = 'ALL';
     else if (thingy.graph.default)

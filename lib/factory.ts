@@ -30,7 +30,7 @@ export default class Factory
         via: A.PathVia,
         shortest: boolean,
         cyclic: boolean,
-        maxlength: number | undefined,
+        maxLength: number | undefined,
         limit: number | undefined,
         offset: number | undefined
         
@@ -48,7 +48,7 @@ export default class Factory
             via,
             shortest,
             cyclic,
-            maxlength,
+            maxLength,
             limit,
             offset
         };

@@ -122,8 +122,10 @@ function translatePaths(op: Algebra.Paths): PathsQuery {
     let via: PathVia;
     if (op.via.type === 'Path') {
         via = { type: 'Path', value: translatePathComponent(op.via.value) };
-    } else {
+    } else if (op.via.type === 'Variable') {
         via = op.via;
+    } else {
+        via = translateOperation(op.via.value);
     }
     return {
         type: 'query',
@@ -134,7 +136,7 @@ function translatePaths(op: Algebra.Paths): PathsQuery {
         via: via,
         shortest: op.shortest,
         cyclic: op.cyclic,
-        maxlength: op.maxlength,
+        maxLength: op.maxLength,
         limit: op.limit,
         offset: op.offset
     };

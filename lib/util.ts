@@ -362,7 +362,7 @@ export default class Util
             result.via,
             result.shortest,
             result.cyclic,
-            result.maxlength,
+            result.maxLength,
             result.limit,
             result.offset
             );

@@ -92,7 +92,7 @@ export interface Paths extends BaseOperation {
     via: PathVia;
     shortest: boolean;
     cyclic: boolean;
-    maxlength?: number;   
+    maxLength?: number;   
     limit?: number;
     offset?: number;
 }
@@ -105,7 +105,7 @@ export interface PathEndpoint {
 export type PathVia = 
     { type: 'Variable', value: VariableTerm } |
     { type: 'Path', value: PropertyPathSymbol } |
-    { type: 'Pattern', value: P[] };
+    { type: 'Pattern', value: Operation };
 
 export interface Single extends BaseOperation
 {
