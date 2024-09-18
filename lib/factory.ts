@@ -24,9 +24,9 @@ export default class Factory
     }
     createPaths(
         startVar: VariableTerm, 
-        startValue: IriTerm | Pattern[] | undefined,
+        startValue: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: A.Operation } | undefined,
         endVar: VariableTerm,
-        endValue: IriTerm | Pattern[] | undefined,
+        endValue: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: A.Operation } | undefined,
         via: A.PathVia,
         shortest: boolean,
         cyclic: boolean,

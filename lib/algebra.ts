@@ -99,7 +99,7 @@ export interface Paths extends BaseOperation {
 
 export interface PathEndpoint {
     variable: VariableTerm;
-    input?: IriTerm | P[];
+    input?: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: Operation };
 }
 
 export type PathVia = 

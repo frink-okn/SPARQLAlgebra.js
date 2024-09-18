@@ -34,7 +34,8 @@ import {
     Wildcard,
     AskQuery,
     DescribeQuery,
-    PathVia
+    PathVia,
+    PathEndpoint
 } from 'sparqljs';
 import * as Algebra from './algebra';
 import Factory from './factory';
@@ -127,12 +128,34 @@ function translatePaths(op: Algebra.Paths): PathsQuery {
     } else {
         via = translateOperation(op.via.value);
     }
+    let startInput: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: GroupPattern } | undefined = undefined;
+    if (op.start.input) {
+        if (op.start.input.type === 'NamedNode') {
+            startInput = { 'type': 'NamedNode', value: op.start.input.value };
+        } else {
+            startInput = { 'type': 'Pattern', value: translateOperation(op.start.input.value) };
+        }
+    }
+    let endInput: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: GroupPattern } | undefined = undefined;
+    if (op.end.input) {
+        if (op.end.input.type === 'NamedNode') {
+            endInput = { 'type': 'NamedNode', value: op.end.input.value };
+        } else {
+            endInput = { 'type': 'Pattern', value: translateOperation(op.end.input.value) };
+        }
+    }
     return {
         type: 'query',
         queryType: 'PATHS',
         prefixes: {},
-        start: op.start,
-        end: op.end,
+        start: {
+            variable: op.start.variable,
+            input: startInput
+        },
+        end: {
+            variable: op.end.variable,
+            input: endInput
+        },
         via: via,
         shortest: op.shortest,
         cyclic: op.cyclic,

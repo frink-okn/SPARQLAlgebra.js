@@ -268,11 +268,27 @@ function translatePathsQuery(sparql: PathsQuery): Algebra.Paths
     } else {        
         via = { type: 'Pattern', value: translateGraphPattern(sparql.via.value) };
     }
+    let startInput: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: Algebra.Operation } | undefined;
+    if (sparql.start.input?.type === 'NamedNode') {
+        startInput = sparql.start.input;
+    } else if (sparql.start.input?.type === 'Pattern') {
+        startInput = { type: 'Pattern', value: translateGraphPattern(sparql.start.input.value) };
+    } else {
+        startInput = undefined;
+    }
+    let endInput: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: Algebra.Operation } | undefined;
+    if (sparql.end.input?.type === 'NamedNode') {
+        endInput = sparql.end.input;
+    } else if (sparql.end.input?.type === 'Pattern') {
+        endInput = { type: 'Pattern', value: translateGraphPattern(sparql.end.input.value) };
+    } else {
+        endInput = undefined;
+    }
     return factory.createPaths(
         sparql.start.variable,
-        sparql.start.input,
+        startInput,
         sparql.end.variable,
-        sparql.end.input,
+        endInput,
         via,
         sparql.shortest,
         sparql.cyclic,
