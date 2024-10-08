@@ -14,12 +14,15 @@ import {
     GroupPattern,
     InsertDeleteOperation,
     IriTerm,
+    // VarorIriOrListOfIris,
+    // ListOfIris,
     LoadOperation,
     Ordering,
     Pattern,
     PropertyPath,
     Query,
     SelectQuery,
+    PathsQuery,
     SparqlQuery,
     Triple,
     Update,
@@ -98,10 +101,15 @@ function translateQuery(sparql: SparqlQuery, quads?: boolean, blankToVariable?: 
     findAllVariables(sparql);
 
     if (sparql.type === 'query') {
+        if (sparql.queryType == 'PATHS'){
+            res = translatePathsQuery(sparql as PathsQuery);
+        }
+        else{
         // group and where are identical, having only 1 makes parsing easier, can be undefined in DESCRIBE
         const group: GroupPattern = { type: 'group', patterns: sparql.where || [] };
         res = translateGraphPattern(group);
         res = translateAggregates(sparql, res);
+        }
     }
     else if(sparql.type === 'update') {
         res = translateUpdate(sparql);
@@ -248,6 +256,46 @@ function inScopeVariables(thingy: SparqlQuery | Pattern | PropertyPath | RDF.Ter
     }
 
     return inScope;
+}
+
+function translatePathsQuery(sparql: PathsQuery): Algebra.Paths
+{
+    let via: Algebra.PathVia;
+    if (sparql.via.type === 'Path') {
+        via = { type: 'Path', value: translatePathPredicate(sparql.via.value) };
+    } else if (sparql.via.type === 'Variable') {
+        via = sparql.via;
+    } else {        
+        via = { type: 'Pattern', value: translateGraphPattern(sparql.via.value) };
+    }
+    let startInput: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: Algebra.Operation } | undefined;
+    if (sparql.start.input?.type === 'NamedNode') {
+        startInput = sparql.start.input;
+    } else if (sparql.start.input?.type === 'Pattern') {
+        startInput = { type: 'Pattern', value: translateGraphPattern(sparql.start.input.value) };
+    } else {
+        startInput = undefined;
+    }
+    let endInput: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: Algebra.Operation } | undefined;
+    if (sparql.end.input?.type === 'NamedNode') {
+        endInput = sparql.end.input;
+    } else if (sparql.end.input?.type === 'Pattern') {
+        endInput = { type: 'Pattern', value: translateGraphPattern(sparql.end.input.value) };
+    } else {
+        endInput = undefined;
+    }
+    return factory.createPaths(
+        sparql.start.variable,
+        startInput,
+        sparql.end.variable,
+        endInput,
+        via,
+        sparql.shortest,
+        sparql.cyclic,
+        sparql.maxLength,
+        sparql.limit,
+        sparql.offset
+    );
 }
 
 function translateGraphPattern(thingy: Pattern) : Algebra.Operation
@@ -422,7 +470,7 @@ function translatePathPredicate(predicate: IriTerm | PropertyPath) : Algebra.Pro
         for (let item of items)
         {
             if (Util.isSimpleTerm(item))
-                normals.push(item);
+                normals.push(item as RDF.NamedNode);
             else if (item.pathType === '^')
                 inverted.push(item.items[0] as RDF.NamedNode);
             else
@@ -790,7 +838,7 @@ function mapAggregate (thingy: mapAggregateType, aggregates: NodeJS.Dict<Aggrega
     if ('expression' in thingy && thingy.expression)
         return { ...thingy, expression: mapAggregate(thingy.expression, aggregates) };
     if ('args' in thingy && thingy.args)
-        return { ...thingy, args: thingy.args.map(subthingy => mapAggregate(subthingy, aggregates)) };
+        return { ...thingy, args: thingy.args.map((subthingy: any) => mapAggregate(subthingy, aggregates)) };
 
     // Normal variable/wildcard
     return thingy;
@@ -875,7 +923,7 @@ function translateUpdateGraph (thingy: CreateOperation | ClearDropOperation): Al
 {
     let source: 'DEFAULT' | 'NAMED' | 'ALL' | RDF.NamedNode;
     if (Util.isSimpleTerm(thingy.graph))
-        source = thingy.graph;
+        source = thingy.graph as RDF.NamedNode;
     else if (thingy.graph.all)
         source = 'ALL';
     else if (thingy.graph.default)

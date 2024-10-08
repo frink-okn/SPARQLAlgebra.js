@@ -1,6 +1,7 @@
 import * as rdfjs from '@rdfjs/types';
-import { Wildcard } from 'sparqljs';
+import { IriTerm, VariableTerm, Wildcard } from 'sparqljs';
 import { Term } from '@rdfjs/types';
+import { Variable, Pattern as P } from 'sparqljs';
 
 export enum types {
     ALT=                'alt',
@@ -35,7 +36,7 @@ export enum types {
     VALUES=             'values',
     ZERO_OR_MORE_PATH=  'ZeroOrMorePath',
     ZERO_OR_ONE_PATH=   'ZeroOrOnePath',
-
+    PATHS=              'paths',
     COMPOSITE_UPDATE=   'compositeupdate',
     DELETE_INSERT=      'deleteinsert',
     LOAD=               'load',
@@ -63,7 +64,7 @@ type valueOf<T> = T[keyof T];
 export type Operation =
   Ask | Expression | Bgp | Construct | Describe | Distinct | Extend | From | Filter | Graph | Group | Join | LeftJoin |
   Minus | Nop | OrderBy | Path | Pattern | Project | PropertyPathSymbol | Reduced | Service | Slice | Union | Values |
-  Update;
+  Update | Paths;
 
 export type Expression = AggregateExpression | GroupConcatExpression | ExistenceExpression | NamedExpression |
   OperatorExpression | TermExpression | WildcardExpression | BoundAggregate;
@@ -83,6 +84,28 @@ export interface BaseOperation
     metadata?: Record<string, unknown>;
     type: types;
 }
+
+export interface Paths extends BaseOperation {
+    type: types.PATHS;
+    start: PathEndpoint;
+    end: PathEndpoint;
+    via: PathVia;
+    shortest: boolean;
+    cyclic: boolean;
+    maxLength?: number;   
+    limit?: number;
+    offset?: number;
+}
+
+export interface PathEndpoint {
+    variable: VariableTerm;
+    input?: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: Operation };
+}
+
+export type PathVia = 
+    { type: 'Variable', value: VariableTerm } |
+    { type: 'Path', value: PropertyPathSymbol } |
+    { type: 'Pattern', value: Operation };
 
 export interface Single extends BaseOperation
 {

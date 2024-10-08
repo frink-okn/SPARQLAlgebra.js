@@ -1,8 +1,8 @@
 import * as A from './algebra';
 import * as RDF from '@rdfjs/types';
-import { DataFactory } from 'rdf-data-factory';
+import { DataFactory, Variable } from 'rdf-data-factory';
 import { stringToTerm } from "rdf-string";
-import { Wildcard } from 'sparqljs';
+import { IriTerm, Wildcard, Variable as variable , Pattern, VariableTerm} from 'sparqljs';
 
 export default class Factory
 {
@@ -21,6 +21,37 @@ export default class Factory
         const result = <A.BoundAggregate>this.createAggregateExpression(aggregate, expression, distinct, separator);
         result.variable = variable;
         return result;
+    }
+    createPaths(
+        startVar: VariableTerm, 
+        startValue: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: A.Operation } | undefined,
+        endVar: VariableTerm,
+        endValue: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: A.Operation } | undefined,
+        via: A.PathVia,
+        shortest: boolean,
+        cyclic: boolean,
+        maxLength: number | undefined,
+        limit: number | undefined,
+        offset: number | undefined
+        
+    ): A.Paths {
+        return {
+            type: A.types.PATHS,
+            start: {
+                variable: startVar,
+                input: startValue
+            },
+            end: {
+                variable: endVar,
+                input: endValue
+            },
+            via,
+            shortest,
+            cyclic,
+            maxLength,
+            limit,
+            offset
+        };
     }
     createBgp (patterns: A.Pattern[]): A.Bgp { return { type: A.types.BGP, patterns }; }
     createConstruct (input: A.Operation, template: A.Pattern[]): A.Construct { return { type: A.types.CONSTRUCT, input, template }; }

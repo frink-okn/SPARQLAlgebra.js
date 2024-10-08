@@ -23,6 +23,7 @@ import {
     PropertyPath,
     Query,
     SelectQuery,
+    PathsQuery,
     ServicePattern,
     Triple,
     UnionPattern,
@@ -30,7 +31,11 @@ import {
     ValuePatternRow,
     ValuesPattern,
     Variable,
-    Wildcard
+    Wildcard,
+    AskQuery,
+    DescribeQuery,
+    PathVia,
+    PathEndpoint
 } from 'sparqljs';
 import * as Algebra from './algebra';
 import Factory from './factory';
@@ -108,9 +113,56 @@ function translateOperation(op: Algebra.Operation): any
         case types.ADD:              return translateAdd(op);
         case types.MOVE:             return translateMove(op);
         case types.COPY:             return translateCopy(op);
+        case types.PATHS:            return translatePaths(op);
     }
 
     throw new Error(`Unknown Operation type ${op.type}`);
+}
+
+function translatePaths(op: Algebra.Paths): PathsQuery {
+    let via: PathVia;
+    if (op.via.type === 'Path') {
+        via = { type: 'Path', value: translatePathComponent(op.via.value) };
+    } else if (op.via.type === 'Variable') {
+        via = op.via;
+    } else {
+        via = translateOperation(op.via.value);
+    }
+    let startInput: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: GroupPattern } | undefined = undefined;
+    if (op.start.input) {
+        if (op.start.input.type === 'NamedNode') {
+            startInput = { 'type': 'NamedNode', value: op.start.input.value };
+        } else {
+            startInput = { 'type': 'Pattern', value: translateOperation(op.start.input.value) };
+        }
+    }
+    let endInput: { type: 'NamedNode', value: IriTerm } | { type: 'Pattern', value: GroupPattern } | undefined = undefined;
+    if (op.end.input) {
+        if (op.end.input.type === 'NamedNode') {
+            endInput = { 'type': 'NamedNode', value: op.end.input.value };
+        } else {
+            endInput = { 'type': 'Pattern', value: translateOperation(op.end.input.value) };
+        }
+    }
+    return {
+        type: 'query',
+        queryType: 'PATHS',
+        prefixes: {},
+        start: {
+            variable: op.start.variable,
+            input: startInput
+        },
+        end: {
+            variable: op.end.variable,
+            input: endInput
+        },
+        via: via,
+        shortest: op.shortest,
+        cyclic: op.cyclic,
+        maxLength: op.maxLength,
+        limit: op.limit,
+        offset: op.offset
+    };
 }
 
 function translateExpression(expr: Algebra.Expression): any
@@ -206,6 +258,7 @@ function translateOperatorExpression(expr: Algebra.OperatorExpression): Ordering
 
     if (result.operator === 'in' || result.operator === 'notin')
         result.args = [result.args[0]].concat([result.args.slice(1)]);
+        //result.args = [result.args[0], result.args.slice(1) as any];
 
     return result;
 }
